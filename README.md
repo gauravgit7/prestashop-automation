@@ -17,8 +17,7 @@ This project automates the \*\*mandatory flows\*\* defined in the QA automation 
 \#\# Setup Instructions  
 \#\#\# 1\. Clone the Repository  
 \`\`\`bash  
-git clone https://github.com/\<your-username\>/cypresstest.git  
-cd cypresstest
+git clone https://github.com/gauravgit7/prestashop-automation.git  
 
 ### **2\. Install Dependencies**
 
@@ -30,12 +29,12 @@ npx cypress open
 
 ### **4\. Run Tests in CLI**
 
-npx cypress run \--spec "cypress/e2e/register\_and\_purchase.spec.js"
+npx cypress run \--spec "cypress/e2e/login.cy.js"
 
 ## **Test File**
 
 Main test script:  
-cypress/e2e/register\_and\_purchase.spec.js
+cypress/e2e/login.cy.js
 
 The test covers:
 
@@ -69,6 +68,34 @@ The script validates:
 3. **Modal Handling**  
    * The Add to Cart confirmation modal is dynamically injected and sometimes hidden by default (display: none).  
    * Cypress needed careful waiting for visibility before proceeding.
+  
+## ** HTTP Errors **
+
+** Impact Summary **
+* The test failed to complete the checkout flow due to a critical server-side error (502 Bad Gateway) on the POST /en/cart request.
+
+** Explanation **
+During the automated test, some HTTP requests failed:
+POST /en/cart (502 Bad Gateway)
+Triggered when the “Add to Cart” button is clicked.
+Responsible for adding the product to the cart and opening the cart modal.
+Failure blocked the checkout flow, preventing the test from completing successfully.
+GET /2-small_default/hummingbird-printed-t-shirt.jpg (502 Bad Gateway, intermittent)
+Requests the product image for the item being added.
+Sometimes works, sometimes fails due to server instability.
+While it doesn’t block the test, it’s captured as evidence of server instability.
+Captured HTTP Errors:
+Method	URL	Status	Response Time (ms)
+GET	/2-small_default/hummingbird-printed-t-shirt.jpg	502	67513.960
+POST	/en/cart	502	67593.124
+
+** Notes **
+
+* All logs were captured directly from the Cypress terminal.
+* The POST /en/cart failure is the critical error causing test failure.
+* The GET request failures are intermittent and expected on the demo server.
+* Due to the unusual behavior of the demo site, there were several failed requests, but most did not affect the test flow.
+* Only the POST /en/cart requests had a direct impact on the test outcome.
 
 ## **Assumptions**
 
@@ -79,8 +106,5 @@ The script validates:
 ## **Deliverables**
 
 1. Cypress test script:  
-   * cypress/e2e/register\_and\_purchase.spec.js  
-2. README file (this document).  
-3. Test Execution Evidence:  
-   * Console logs or Cypress runner results.
-
+   * ccypress/e2e/login.cy.js
+2. README file  
